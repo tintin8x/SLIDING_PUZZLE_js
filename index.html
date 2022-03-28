@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <title>Sliding Puzzle</title>
     <style>
-        body {font-family: Arial, Helvetica, sans-serif;}
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
 
         .msgBox {
             position: absolute;
-            top:100px;
-            left : 75px;
-            /*bottom: 35px;*/
-            right: 20px;
-            margin-left: 20px;
-            max-width: 300px;
+            top: 200px;
+            width: 100%;
         }
 
         .msgBox-header {
@@ -36,28 +34,35 @@
         .closebtn:hover {
             color: lightgrey;
         }
+
         .container {
-            position: absolute;
+            /*position: absolute;*/
             background: white;
+
         }
-        #gameCanvas{
+
+        #gameCanvas {
             position: relative;
-            background-image:    url(/image/backGround8.gif);
-            background-size:     cover;
-            background-repeat:   no-repeat;
+            background-image: url(/image/backGround8.gif);
+            background-size: cover;
+            background-repeat: no-repeat;
             background-position: center center;
-            top : 0px;
+            top: 0px;
         }
     </style>
 </head>
+
 <body onkeydown="GB.moveCell(event)" onclick="GB.changeFullImage(event)">
-<div class="container">
-    <canvas id="gameCanvas" width="480px" height="610px" style="border: solid 2px #000 ;"  ></canvas>
-</div>
-<div class="msgBox">
-    <div id = "msgHeader" class="msgBox-header"></div>
+<center>
+    <div class="container">
+        <canvas id="gameCanvas" width="480px" height="610px" style="border: solid 2px #000 ;"></canvas>
+    </div>
+    <div class="msgBox">
+    <div id="msgHeader" class="msgBox-header"></div>
     <span class="closebtn" onclick="this.parentElement.style.display='none';">×</span>
 </div>
+</center>
+
 </body>
 <script src="myScript.js"></script>
 </html>

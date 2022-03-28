@@ -82,8 +82,6 @@ class GameBoard {
     cellArr;
     imgArr;
     fullImgCell;
-    // width;
-    // height;
     moveUpSound;
     moveDownSound;
     moveLeftSound;
@@ -165,8 +163,11 @@ class GameBoard {
         this.changeImgSound = new gameSound("sound/Đổi ảnh.mp3");
         this.winSound = new gameSound("sound/Thắng rồi.mp3");
         this.msg.innerHTML = "BẮT ĐẦU"
+
         let div = GB.msg.parentElement;
-        setTimeout(function(){ div.style.display = "none"; }, 1500);
+        setTimeout(function(){
+            div.style.display = "none";
+            }, 1500);
     }
 
     shuffleImg() {
