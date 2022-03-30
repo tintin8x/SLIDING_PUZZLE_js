@@ -43,7 +43,7 @@
 
         #gameCanvas {
             position: relative;
-            background-image: url(/image/backGround8.gif);
+            background-image: url(/image/backGround13.gif);
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
@@ -52,10 +52,10 @@
     </style>
 </head>
 
-<body onkeydown="GB.moveCell(event)" onclick="GB.changeFullImage(event)">
+<body onkeydown="GB.keyControl(event)" onclick="GB.changeFullImage(event)" >
 <center>
     <div class="container">
-        <canvas id="gameCanvas" width="480px" height="610px" style="border: solid 2px #000 ;"></canvas>
+        <canvas id="gameCanvas" width="480px" height="625px" style="border: solid 2px #000 ;"></canvas>
     </div>
     <div class="msgBox">
     <div id="msgHeader" class="msgBox-header"></div>

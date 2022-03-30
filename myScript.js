@@ -4,7 +4,7 @@ const CELL_BORDER = 3;
 const BLANK_IMAGE_NAME = "row-0-column-1.png";
 const FULL_IMAGE_NAME = "full.PNG"
 const FULL_IMAGE_TOP = 40;
-const FULL_IMAGE_LEFT = 260;
+const FULL_IMAGE_LEFT = 264;
 const BOARD_ROW_NUM = 6;
 const BOARD_COL_NUM = 3;
 
@@ -90,9 +90,45 @@ class GameBoard {
     changeImgSound;
     winSound;
     score;
-    win = "false"
+    menuShow = false;
+    win = false;
     fullImgArr = ["CR7", "GIRL1", "GIRL2", "XE", "CAT", "DOG"];
     msg = document.getElementById("msgHeader");
+
+    roundRect(x, y, width, height, radius, fill, stroke) {
+        if (typeof stroke === 'undefined') {
+            stroke = true;
+        }
+        if (typeof radius === 'undefined') {
+            radius = 5;
+        }
+        if (typeof radius === 'number') {
+            radius = {tl: radius, tr: radius, br: radius, bl: radius};
+        } else {
+            let defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+            for (let side in defaultRadius) {
+                radius[side] = radius[side] || defaultRadius[side];
+            }
+        }
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + radius.tl, y);
+        this.ctx.lineTo(x + width - radius.tr, y);
+        this.ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+        this.ctx.lineTo(x + width, y + height - radius.br);
+        this.ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+        this.ctx.lineTo(x + radius.bl, y + height);
+        this.ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+        this.ctx.lineTo(x, y + radius.tl);
+        this.ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+        this.ctx.closePath();
+        if (fill) {
+            this.ctx.fill();
+        }
+        if (stroke) {
+            this.ctx.stroke();
+        }
+
+    }
 
     init(imgFol) {
 
@@ -103,18 +139,24 @@ class GameBoard {
         this.score = 100;
 
         this.ctx.fillStyle = "white";
-        this.ctx.fillRect(110, 5, 255, 600);
+        this.ctx.shadowColor = 'black';
+        this.ctx.shadowBlur = 5;
+        this.ctx.shadowOffsetX = 5;
+        this.ctx.shadowOffsetY = 5;
+        this.ctx.fill();
+        this.roundRect(110, 5, 260, 614, 10);
 
+        this.ctx.shadowColor = 'transparent';
+        this.ctx.fill();
         this.ctx.font = "25px Arial";
         this.ctx.fillStyle = "blue";
         this.ctx.fillText("SLIDING PUZZLE", 135, 30);
         this.drawScore();
 
         this.fullImgCell = new imgCell(0, 1.2 * CELL_WIDTH, 2 * CELL_HEIGHT, FULL_IMAGE_LEFT, FULL_IMAGE_TOP);
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'blue';
-        this.ctx.fillRect(260, 40, 1.2 * CELL_WIDTH, 2 * CELL_HEIGHT);
-        this.ctx.closePath();
+        this.ctx.fillStyle = "rgba(255, 255, 0, .5)";
+        this.ctx.strokeStyle = "red";
+        this.roundRect(FULL_IMAGE_LEFT, FULL_IMAGE_TOP, 1.2 * CELL_WIDTH, 2 * CELL_HEIGHT, 5, true);
 
         this.fullImgCell.imgFol = imgFol;
         this.fullImgCell.imgName = FULL_IMAGE_NAME;
@@ -127,18 +169,16 @@ class GameBoard {
 
             for (let j = 0; j < BOARD_COL_NUM; j++) {
 
-                let x = 120 + j * CELL_WIDTH - j * CELL_BORDER;
-                let y = 130 + i * CELL_HEIGHT - i * CELL_BORDER;
+                let x = 120 + j * CELL_WIDTH;
+                let y = 130 + i * CELL_HEIGHT;
 
                 let c = new imgCell(1, CELL_WIDTH, CELL_HEIGHT, x, y, i, j + 1)
                 let imgName = "row-" + i + "-column-" + (j + 1) + ".png";
 
-                this.ctx.beginPath();
-                this.ctx.fillStyle = 'blue';
-                this.ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
-                this.ctx.fillStyle = 'white';
-                this.ctx.fillRect(x + CELL_BORDER, y + CELL_BORDER, CELL_WIDTH - 2 * CELL_BORDER, CELL_HEIGHT - 2 * CELL_BORDER);
-                this.ctx.closePath();
+                this.ctx.fillStyle = "rgba(255, 255, 0, .5)";
+                this.ctx.strokeStyle = "red";
+
+                this.roundRect(x, y, CELL_WIDTH, CELL_HEIGHT, 5, true);
 
                 c.imgFol = imgFol;
 
@@ -146,34 +186,37 @@ class GameBoard {
                 this.cellArr[i][j] = c;
 
                 if (i == 0) {
-                    j = j + 2;
+                    j = j + BOARD_COL_NUM - 1;
                 }
 
             }
         }
 
-        // this.moveSound = new gameSound("sound/move.wav");
-        // this.cantMoveSound = new gameSound("sound/hit.wav");
-        // this.changeImgSound = new gameSound("sound/changeImg.wav");
-        this.moveDownSound = new gameSound("sound/Xuống.mp3");
-        this.moveUpSound = new gameSound("sound/Lên.mp3");
-        this.moveLeftSound = new gameSound("sound/Trái.mp3");
-        this.moveRightSound = new gameSound("sound/Phải.mp3");
-        this.cantMoveSound = new gameSound("sound/Vướng rồi.mp3");
-        this.changeImgSound = new gameSound("sound/Đổi ảnh.mp3");
-        this.winSound = new gameSound("sound/Thắng rồi.mp3");
-        this.msg.innerHTML = "BẮT ĐẦU"
+        let soundFolder = "normal"
+        let soundType = "wav"
+        this.moveDownSound = new gameSound("sound/" + soundFolder + "/down." + soundType);
+        this.moveUpSound = new gameSound("sound/" + soundFolder + "/up." + soundType);
+        this.moveLeftSound = new gameSound("sound/" + soundFolder + "/left." + soundType);
+        this.moveRightSound = new gameSound("sound/" + soundFolder + "/right." + soundType);
+        this.cantMoveSound = new gameSound("sound/" + soundFolder + "/hit." + soundType);
+        this.changeImgSound = new gameSound("sound/" + soundFolder + "/changeImg." + soundType);
+        this.winSound = new gameSound("sound/" + soundFolder + "/win." + soundType);
+        this.msg.innerHTML = "BẮT ĐẦU<br>Nhấn nút cách để xem hướng dẫn"
 
-        let div = GB.msg.parentElement;
-        setTimeout(function(){
+        let div = this.msg.parentElement;
+        setTimeout(function () {
             div.style.display = "none";
-            }, 1500);
+        }, 3000);
     }
 
-    shuffleImg() {
+    shuffleImg(toWin) {
         fisherYates(this.imgArr, 1);
         for (let i = 0; i < BOARD_ROW_NUM; i++) {
             for (let j = 0; j < BOARD_COL_NUM; j++) {
+                if (toWin == true) {
+                    let imgName = "row-" + i + "-column-" + (j + 1) + ".png";
+                    this.imgArr[i][j] = imgName;
+                }
                 this.cellArr[i][j].imgName = this.imgArr[i][j];
                 if (i == 0) {
                     j = j + BOARD_COL_NUM - 1;
@@ -182,6 +225,29 @@ class GameBoard {
         }
 
         this.drawAllImages();
+
+        function fisherYates(myArray, startRow) {
+            for (let i = myArray.length - 1; i >= startRow; i--) {
+                for (let j = myArray[i].length - 1; j > 0; j--) {
+                    let m;
+                    let n;
+                    if (i == startRow) {
+                        m = startRow + Math.floor(Math.random() * (myArray.length - 1))
+                        n = Math.floor(Math.random() * (myArray[startRow].length - 1))
+                    } else {
+                        m = startRow + Math.floor(Math.random() * (i - 1))
+                        n = Math.floor(Math.random() * (j - 1))
+                    }
+                    if ((i == startRow && j == 0) || (m == startRow && n == 0)) {
+
+                    } else {
+                        let temp = myArray[i][j];
+                        myArray[i][j] = myArray[m][n];
+                        myArray[m][n] = temp;
+                    }
+                }
+            }
+        }
     }
 
     drawAllImages() {
@@ -200,24 +266,40 @@ class GameBoard {
         }
     }
 
-    moveCell(event) {
-
+    keyControl(event) {
+        event.preventDefault();
         switch (event.which) {
+            case 32:
+                if (event.ctrlKey == false) {
+                    this.showMenu();
+                } else {
+                    this.winNow();
+                }
+
+                break;
             case 37:
                 this.moveLeft();
-                if( this.win == true){this.start();}
+                if (this.win == true) {
+                    this.start();
+                }
                 break;
             case 38:
                 this.moveUp();
-                if( this.win == true){this.start();}
+                if (this.win == true) {
+                    this.start();
+                }
                 break;
             case 39:
                 this.moveRight();
-                if( this.win == true){this.start();}
+                if (this.win == true) {
+                    this.start();
+                }
                 break;
             case 40:
                 this.moveDown();
-                if( this.win == true){this.start();}
+                if (this.win == true) {
+                    this.start();
+                }
                 break;
         }
 
@@ -358,6 +440,11 @@ class GameBoard {
         this.ctx.fillText("Score: " + this.score, 140, 70);
     }
 
+    winNow() {
+        this.shuffleImg(true);
+        this.win = this.checkWin();
+    }
+
     randomfullImg() {
         let i = Math.floor(Math.random() * this.fullImgArr.length)
         this.imgArr = [];
@@ -372,19 +459,19 @@ class GameBoard {
         let c = a + 1.2 * CELL_WIDTH;
         let d = b + 2 * CELL_HEIGHT;
 
-        if (a<x && x<c && y > b && y < d) {
+        if (a < x && x < c && y > b && y < d) {
             this.randomfullImg();
             this.shuffleImg();
             this.changeImgSound.play();
         }
     }
 
-    checkWin(){
+    checkWin() {
         let win = true;
         for (let i = 0; i < BOARD_ROW_NUM && win == true; i++) {
             for (let j = 0; j < BOARD_COL_NUM && win == true; j++) {
                 let imgName = "row-" + i + "-column-" + (j + 1) + ".png";
-                if(this.cellArr[i][j].imgName != imgName){
+                if (this.cellArr[i][j].imgName != imgName) {
                     win = false;
                     break;
                 }
@@ -393,7 +480,7 @@ class GameBoard {
                 }
             }
         }
-        if (win == true){
+        if (win == true) {
             this.winSound.play();
             this.msg.innerHTML = "THẮNG RỒI!"
             let div = this.msg.parentElement;
@@ -402,54 +489,29 @@ class GameBoard {
         return win;
     }
 
-    start(){
-        this.randomfullImg();
-        this.shuffleImg();
-    }
-
-}
-
-function fisherYates(myArray, startRow) {
-    for (let i = myArray.length - 1; i >= startRow; i--) {
-        for (let j = myArray[i].length - 1; j > 0; j--) {
-            let m;
-            let n;
-            if (i == startRow) {
-                m = startRow + Math.floor(Math.random() * (myArray.length - 1))
-                n = Math.floor(Math.random() * (myArray[startRow].length - 1))
-            } else {
-                m = startRow + Math.floor(Math.random() * (i - 1))
-                n = Math.floor(Math.random() * (j - 1))
-            }
-            if((i == startRow && j == 0) || (m == startRow && n ==0 )){
-
-            }else{
-                let temp = myArray[i][j];
-                myArray[i][j] = myArray[m][n];
-                myArray[m][n] = temp;
-            }
+    showMenu() {
+        if (this.menuShow == false) {
+            this.msg.innerHTML = "Dùng các phím ↓ ↑ ← → để sắp xếp các ô ảnh cho đúng vị trí theo ảnh mẫu phía trên"
+            this.msg.innerHTML = this.msg.innerHTML + "<br>Click vào ảnh mẫu để thay đổi ảnh mẫu"
+            this.msg.innerHTML = this.msg.innerHTML + "<br>Giữ Ctrl và ấn dấu cách để thử cảm giác chiến thắng :D"
+            let div = this.msg.parentElement;
+            div.style.display = "block";
+            this.menuShow = true;
+        } else {
+            let div = this.msg.parentElement;
+            div.style.display = "none";
+            this.menuShow = false;
         }
     }
-}
 
-window.addEventListener("keydown", function (e) {
-    if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
-        e.preventDefault();
-    }
-}, false);
-
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        // Generate random number
-        let j = Math.floor(Math.random() * (i + 1));
-
-        let temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
+    start() {
+        this.randomfullImg();
+        this.shuffleImg(false);
     }
 
-    return array;
 }
+
+
 
 let GB = new GameBoard();
 GB.start()
