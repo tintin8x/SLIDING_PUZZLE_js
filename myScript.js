@@ -275,31 +275,18 @@ class GameBoard {
                 } else {
                     this.winNow();
                 }
-
                 break;
             case 37:
                 this.moveLeft();
-                if (this.win == true) {
-                    this.start();
-                }
                 break;
             case 38:
                 this.moveUp();
-                if (this.win == true) {
-                    this.start();
-                }
                 break;
             case 39:
                 this.moveRight();
-                if (this.win == true) {
-                    this.start();
-                }
                 break;
             case 40:
                 this.moveDown();
-                if (this.win == true) {
-                    this.start();
-                }
                 break;
         }
 
@@ -510,7 +497,6 @@ class GameBoard {
     }
 
 }
-
 
 
 let GB = new GameBoard();
